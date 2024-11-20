@@ -57,7 +57,7 @@ object MovieLens {
         map({case ((m,t),(sum,cnt)) => (m, t, sum/cnt, cnt)}).
         coalesce(1).
         toDF().write.format("csv").mode(SaveMode.Overwrite).
-        save(Commons.getDatasetPath(deploymentMode,path_output_avgRatPerMovie))
+        save(Commons.getDatasetPath(writeMode,path_output_avgRatPerMovie))
     }
     else if (job=="2"){
       rddRatings.
@@ -68,7 +68,7 @@ object MovieLens {
         map({case (m,((r,cnt),t)) => (m,t,r,cnt)}).
         coalesce(1).
         toDF().write.format("csv").mode(SaveMode.Overwrite).
-        save(Commons.getDatasetPath(deploymentMode,path_output_avgRatPerMovie))
+        save(Commons.getDatasetPath(writeMode,path_output_avgRatPerMovie))
     }
     else if (job=="3"){
       val bRddMovies = spark.sparkContext.broadcast(rddMoviesKV.collectAsMap())
@@ -79,7 +79,7 @@ object MovieLens {
         map({case (m,(r,cnt)) => (m,bRddMovies.value.get(m),r,cnt)}).
         coalesce(1).
         toDF().write.format("csv").mode(SaveMode.Overwrite).
-        save(Commons.getDatasetPath(deploymentMode,path_output_avgRatPerMovie))
+        save(Commons.getDatasetPath(writeMode,path_output_avgRatPerMovie))
     }
     else {
       println("Wrong job number")
