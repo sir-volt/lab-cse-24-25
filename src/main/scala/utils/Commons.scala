@@ -32,9 +32,13 @@ object Commons {
     if(deploymentMode == "local"){
       return "file://" + Config.projectDir + "/" + localPath
     }
-    else{
+    else if(deploymentMode == "remote") {
+      return "s3a://" + Config.s3sharedbucketName + "/" + remotePath
+    }
+    else {
       return "s3a://" + Config.s3bucketName + "/" + remotePath
     }
+  }
   }
 
   def getDatasetPath(deploymentMode: String, path: String): String = {
