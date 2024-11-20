@@ -39,7 +39,6 @@ object Commons {
       return "s3a://" + Config.s3bucketName + "/" + remotePath
     }
   }
-  }
 
   def getDatasetPath(deploymentMode: String, path: String): String = {
     return getDatasetPath(deploymentMode, path, path)

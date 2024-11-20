@@ -28,8 +28,8 @@ object MovieLens {
     }
 
     val deploymentMode = args(0)
-    val writeMode = deploymentMode
-    if (deploymentMode == "remote") {
+    var writeMode = deploymentMode
+    if (deploymentMode == "sharedRemote") {
       writeMode = "remote"
     }
     val job = args(1)
