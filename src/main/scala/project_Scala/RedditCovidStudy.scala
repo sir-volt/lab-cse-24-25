@@ -27,9 +27,6 @@ object RedditCovidStudy {
 
       val deploymentMode = args(0)
       var writeMode = deploymentMode
-      if (deploymentMode == "sharedRemote") {
-        writeMode = "remote"
-      }
 
       // Initialize input
       val rddPosts = spark.sparkContext.

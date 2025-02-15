@@ -31,13 +31,15 @@ object Commons {
   def getDatasetPath(deploymentMode: String, localPath: String, remotePath: String): String = {
     if(deploymentMode == "local"){
       return "file://" + Config.projectDir + "/" + localPath
+    } else {
+      return "s3a://" + Config.s3bucketName + "/" + remotePath
     }
+      /*
     else if(deploymentMode == "sharedRemote"){
       return "s3a://" + Config.s3sharedbucketName + "/" + remotePath
     }
-    else{
-      return "s3a://" + Config.s3bucketName + "/" + remotePath
-    }
+       */
+
   }
 
   def getDatasetPath(deploymentMode: String, path: String): String = {
