@@ -8,7 +8,7 @@ import org.apache.spark.sql._
 
 object RedditCovidStudy {
 
-    val path_to_bigDatasets = "../../../../datasets/big/"
+    val path_to_bigDatasets = "/datasets/big/"
 
     val path_Fullml_posts = path_to_bigDatasets + "the-reddit-covid-dataset-posts.csv"
     val path_Fullml_comments = path_to_bigDatasets + "the-reddit-covid-dataset-comments.csv"
@@ -31,10 +31,10 @@ object RedditCovidStudy {
       // Initialize input
       val rddPosts = spark.sparkContext.
         textFile(Commons.getDatasetPath(deploymentMode, path_Fullml_posts)).
-        flatMap(RedditCovidParser.parseRedditPost).filter(x => x != ("", "", "", false, -1, "", "", "", "", "", -1))
+        flatMap(RedditCovidParser.parseRedditPost).filter(x => x != ("", "", "", false, "", "", "", "", "", "", -1))
       val rddComments = spark.sparkContext.
-        textFile(Commons.getDatasetPath(deploymentMode, path_sample_comments)).
-        flatMap(RedditCovidParser.parseRedditComment).filter(x => x != ("", "", "", false, -1, "", "", -0.1, -1))
+        textFile(Commons.getDatasetPath(deploymentMode, path_Fullml_comments)).
+        flatMap(RedditCovidParser.parseRedditComment).filter(x => x != ("", "", "", false, "", "", "", -0.1, -1))
 
       // Starting Job
       //PART 1: Aggregate on temporal dimension and obtain percentage of posts classified as NSFW
@@ -62,10 +62,12 @@ object RedditCovidStudy {
           val avgSentiment = totalSentiment / totalCount
           ("Percentage NSFW Comments: " + nsfwPercentage + "%", "Average Sentiment: " + avgSentiment)
         })
+
       // PART 3: Join on Temporal Dimension
-      val finalResult = percentageNSFWPosts.join(avgSentimentWithNSFWComment).
-      coalesce(1).
-      toDF().write.format("csv").mode(SaveMode.Overwrite).
-      save(Commons.getDatasetPath(writeMode, path_output))
+      val finalResult = percentageNSFWPosts.join(avgSentimentWithNSFWComment)
+        //with the join i get an Array[(String,(String,(String, String)))], in order to properly write it, i map it first then change it
+        .map(x => (x._1, x._2._1, x._2._2._1, x._2._2._2))
+        .coalesce(1) //riduzione a singola partizione (per analisi, con singola partizione abbiamo singolo file da analizzare)
+        .toDF().write.format("csv").mode(SaveMode.Overwrite).save(path_output)
     }
 }
